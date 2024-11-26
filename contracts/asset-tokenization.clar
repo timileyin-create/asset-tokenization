@@ -99,3 +99,22 @@
     )
   )
 )
+
+;; Admin function to approve compliance status
+(define-public (set-compliance-status 
+  (asset-id uint) 
+  (user principal) 
+  (is-approved bool)
+)
+  (begin
+    ;; Only contract owner can set compliance status
+    (asserts! (is-eq tx-sender CONTRACT-OWNER) ERR-UNAUTHORIZED)
+    
+    (map-set compliance-status 
+      {asset-id: asset-id, user: user} 
+      {is-approved: is-approved}
+    )
+    
+    (ok is-approved)
+  )
+)
