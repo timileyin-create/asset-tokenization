@@ -8,6 +8,23 @@
 (define-constant ERR-INVALID-ASSET (err u3))
 (define-constant ERR-TRANSFER-FAILED (err u4))
 (define-constant ERR-COMPLIANCE-CHECK-FAILED (err u5))
+(define-constant ERR-INVALID-INPUT (err u6))
+
+;; Validation functions
+(define-private (is-valid-metadata-uri (uri (string-utf8 256)))
+  (and 
+    (> (len uri) u0)
+    (<= (len uri) u256)
+  )
+)
+
+(define-private (is-valid-asset-id (asset-id uint))
+  (> asset-id u0)
+)
+
+(define-private (is-valid-principal (user principal))
+  (not (is-eq user CONTRACT-OWNER))
+)
 
 ;; Asset registry to track unique assets
 (define-map asset-registry 
@@ -37,9 +54,10 @@
   (metadata-uri (string-utf8 256))
 )
   (begin 
-    ;; Validate input
-    (asserts! (> total-supply u0) ERR-INVALID-ASSET)
-    (asserts! (> fractional-shares u0) ERR-INVALID-ASSET)
+    ;; Enhanced input validation
+    (asserts! (> total-supply u0) ERR-INVALID-INPUT)
+    (asserts! (> fractional-shares u0) ERR-INVALID-INPUT)
+    (asserts! (is-valid-metadata-uri metadata-uri) ERR-INVALID-INPUT)
     
     ;; Generate unique asset ID
     (let ((asset-id (var-get next-asset-id)))
@@ -77,6 +95,10 @@
     (asset (unwrap! (map-get? asset-registry {asset-id: asset-id}) ERR-INVALID-ASSET))
     (sender tx-sender)
   )
+    ;; Enhanced input validation
+    (asserts! (is-valid-asset-id asset-id) ERR-INVALID-INPUT)
+    (asserts! (is-valid-principal to-principal) ERR-INVALID-INPUT)
+    
     ;; Validate transferability and compliance
     (asserts! (get is-transferable asset) ERR-UNAUTHORIZED)
     (asserts! (is-compliance-check-passed asset-id to-principal) ERR-COMPLIANCE-CHECK-FAILED)
@@ -107,6 +129,10 @@
   (is-approved bool)
 )
   (begin
+    ;; Enhanced input validation
+    (asserts! (is-valid-asset-id asset-id) ERR-INVALID-INPUT)
+    (asserts! (is-valid-principal user) ERR-INVALID-INPUT)
+    
     ;; Only contract owner can set compliance status
     (asserts! (is-eq tx-sender CONTRACT-OWNER) ERR-UNAUTHORIZED)
     
