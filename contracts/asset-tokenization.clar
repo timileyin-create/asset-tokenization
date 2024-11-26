@@ -8,3 +8,15 @@
 (define-constant ERR-INVALID-ASSET (err u3))
 (define-constant ERR-TRANSFER-FAILED (err u4))
 (define-constant ERR-COMPLIANCE-CHECK-FAILED (err u5))
+
+;; Asset registry to track unique assets
+(define-map asset-registry 
+  {asset-id: uint} 
+  {
+    owner: principal,
+    total-supply: uint,
+    fractional-shares: uint,
+    metadata-uri: (string-utf8 256),
+    is-transferable: bool
+  }
+)
