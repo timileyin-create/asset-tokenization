@@ -87,3 +87,15 @@
     (ok true)
   )
 )
+
+;; Compliance check function
+(define-private (is-compliance-check-passed 
+  (asset-id uint) 
+  (user principal)
+) 
+  (default-to false 
+    (get is-approved 
+      (map-get? compliance-status {asset-id: asset-id, user: user})
+    )
+  )
+)
