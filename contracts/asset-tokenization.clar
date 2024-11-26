@@ -118,3 +118,11 @@
     (ok is-approved)
   )
 )
+
+;; Initialize next asset ID
+(define-data-var next-asset-id uint u1)
+
+;; Read-only function to get asset details
+(define-read-only (get-asset-details (asset-id uint))
+  (map-get? asset-registry {asset-id: asset-id})
+)
