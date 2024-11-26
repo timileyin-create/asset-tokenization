@@ -20,3 +20,12 @@
     is-transferable: bool
   }
 )
+
+;; Compliance tracking map
+(define-map compliance-status 
+  {asset-id: uint, user: principal} 
+  {is-approved: bool}
+)
+
+;; NFT to represent ownership shares
+(define-non-fungible-token asset-ownership-token uint)
